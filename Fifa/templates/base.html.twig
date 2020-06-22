@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>FIFA - {% block title %}{% endblock %}</title>
+        <link rel="icon" type="image/png" sizes="16x16" href={{ asset('img/favicon-16x16.png') }}>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
+        {% block css %}{% endblock %}
+    </head>
+    <body>
+<nav class="navbar is-dark">
+  <div class="navbar-brand">
+    <a class="navbar-item title is-5" href="https://bulma.io">
+    UEFA
+    </a>
+  </div>
+  <div class="navbar-brand">
+    <a class="navbar-item title is-5" href="{{path('ranking')}}">
+    Classement 
+    <img src="{{ asset('img/classement.jpg') }}" alt="">
+    </a>
+  </div>
+  <div class="navbar-brand">
+    <a class="navbar-item title is-5" href="https://bulma.io">
+    Coupe Du Monde
+    <img src="{{ asset('img/monde.jpg') }}" alt="">
+    </a>
+  </div>
+  <div class="navbar-brand">
+    <a class="navbar-item title is-5" href="{{path('euro')}}">
+    Euro
+    <img src="{{ asset('img/euro.jpg') }}" alt="">
+    </a>
+  </div>
+  <div class="navbar-brand">
+    <a class="navbar-item title is-5" href="{{path('amerique')}}">
+    Copa America
+    <img src="{{ asset('img/amerique.jpg') }}" alt="">
+    </a>
+  </div>
+  <div class="navbar-brand">
+    <a class="navbar-item title is-5" href="{{path('afrique')}}">
+    Can
+    <img src="{{ asset('img/afrique.jpg') }}" alt="">
+    </a>
+  </div>
+  <div class="navbar-brand">
+    <a class="navbar-item title is-5" href="{{path('asie')}}">
+    Asie
+    <img src="{{ asset('img/asie.jpg') }}" alt="">
+    </a>
+  </div>
+  <div class="navbar-brand">
+    <a class="navbar-item title is-5" href="{{path('oceanie')}}">
+    Océanie
+    <img src="{{ asset('img/oceanie.jpg') }}" alt="">
+    </a>
+  </div>
+</nav>
+        {% block body %}{% endblock %}
+        {% block javascripts %}{% endblock %}
+    </body>
+</html>

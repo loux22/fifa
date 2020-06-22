@@ -1,0 +1,140 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Competition - Copa america{% endblock %}
+
+{% block body %}
+
+
+
+
+<style>
+  p {
+    font-weight: bold;
+    font-size: 20px;
+  }
+</style>
+<h1 class="title is-1" style="text-align: center; margin-bottom: 50px;">Amerique</h1>
+
+
+<form action="" method="post">
+  <button class="button is-primary" style="cursor: pointer; margin-bottom: 150px;" type="submit"
+    name="submit">Simuler</button>
+</form>
+
+{% if poule != [] %}
+  
+{% for key,p in poule %}
+<h3 class="title is-3" style="text-align: center;">Poule {{key + 1}}</h3>
+<h5 class="title is-4" >Calendrier</h5>
+{% for game in gamePoule[key] %}
+
+<p style="font-size: 10px;">{{game[0].name}} {{game[1]}} - {{game[2]}} {{game[3].name}}</p>
+<p style="font-size: 10px;">{{game[4]}}</p>
+<br>
+
+{% endfor %}
+
+<table style="width: 100%;" class="table">
+  <thead>
+    <tr>
+      <th>Rang</th>
+      <th>Equipe</th>
+      <th>But marqué</th>
+      <th>But encaissé</th>
+      <th>Difference de but</th>
+      <th>Point</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for rang,value in p %}
+
+    {% if key <= 1 %}
+      {% if rang < 3 %}
+        <tr style="background-color: #ff9900;;">
+      {% endif %}
+    {% else %}
+      {% if rang < 2 %}
+       <tr style="background-color: #ff9900;">
+      {% endif %}
+    {% endif %}
+      <th ><p>{{rang + 1}}</p></th>
+      <th><p>{{value[0].name}}</p></th>
+      <th><p>{{value[2]}}</p></th>
+      <th><p>{{value[3]}}</p></th>
+      {% if value[2] - value[3] > 0 %}
+      <th><p>+{{value[2] - value[3]}}</p></th>
+      {% else %}
+      <th><p>{{value[2] - value[3]}}</p></th>
+      {% endif %}
+      
+      <th><p>{{value[1]}}</p></th>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endfor %}
+
+<h3 class="title is-3" style="text-align: center; margin-top: 250px;">Quart de final</h3>
+
+<table style="width: 100%;" class="table">
+    <thead>
+      <tr>
+        <th>Match</th>
+      </tr>
+    </thead>
+    <tbody>
+        {% for value in gameQuart %}
+    <tr>
+        <th style="display: flex; justify-content: space-around;">
+             <p>{{value[0].name}}</p> 
+             <p>{{value[1]}}</p> 
+             <p>-</p> 
+             <p>{{value[2]}}</p> 
+             <p>{{value[3].name}}</p> 
+             <p>{{value[4]}}</p> 
+        </th>
+    </tr>
+        {% endfor %}
+    </tbody>
+  </table>
+
+
+  <h3 class="title is-3" style="text-align: center;">Demi final</h3>
+
+  <table style="width: 100%;" class="table">
+      <thead>
+        <tr>
+          <th>Match</th>
+        </tr>
+      </thead>
+      <tbody>
+          {% for value in gameDemi %}
+      <tr>
+          <th style="display: flex; justify-content: space-around;">
+               <p>{{value[0].name}}</p> 
+               <p>{{value[1]}}</p> 
+               <p>-</p> 
+               <p>{{value[2]}}</p> 
+               <p>{{value[3].name}}</p> 
+               <p>{{value[4]}}</p> 
+          </th>
+      </tr>
+          {% endfor %}
+      </tbody>
+    </table>
+  
+
+    <h3 class="title is-3" style="text-align: center;">Final</h3>
+  <div style="border: 2px solid rgb(243, 243, 243); box-shadow: 10px 5px 5px black;">
+  <div style="width: 100%; display: flex; justify-content: space-around;">
+    <p>{{gameFinal[0].name}}</p>
+    <p>{{gameFinal[1]}}</p>
+    <p>-</p>
+    <p>{{gameFinal[2]}}</p>
+    <p>{{gameFinal[3].name}}</p>
+</div>
+<h3 class="title is-3" style="text-align: center;">{{gameFinal[4]}}</h3>
+</div>
+
+{% endif %}
+{% endblock %}

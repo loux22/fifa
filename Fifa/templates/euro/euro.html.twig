@@ -1,0 +1,105 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Euro
+{% endblock %}
+
+{% block body %}
+	<style>
+		p {
+			font-weight: bold;
+			font-size: 20px;
+		}
+	</style>
+	{# {{dump(barrageTwo)}}
+	{{dump(gameBarrageTwo)}}
+	{{dump(rankTeam)}}
+	{{dump(chapeau)}}
+    {{dump(poule)}} #}
+
+
+	<h1 class="title is-1" style="text-align: center; margin-bottom: 50px;">Euro</h1>
+
+	<form action="" method="post">
+		<button class="button is-primary" style="cursor: pointer;" type="submit" name="simulate">Simuler</button>
+	</form>
+
+	{% if promoter != [] %}
+		<h3 class="title is-3" style="margin-bottom: 50px;">Organisateur :
+			{% for p in promoter %}
+				{{p.team.name}}
+			{% endfor %}
+		</h3>
+
+		<h3 class="title is-3" style="margin-bottom: 50px;">Barrage 1 :
+		</h3>
+		{% for game in gameBarrageOne %}
+			<p style="font-size: 15px;">{{game[0].name}}
+				{{game[1]}}
+				-
+				{{game[2]}}
+				{{game[3].name}}</p>
+			<p style="font-size: 20px;">{{game[4]}}</p>
+			<br>
+		{% endfor %}
+
+
+		<h3 class="title is-3" style="margin-bottom: 50px;">Barrage 2 :
+		</h3>
+		{% for game in gameBarrageTwo %}
+			<p style="font-size: 15px;">{{game[0].name}}
+				{{game[1]}}
+				-
+				{{game[2]}}
+				{{game[3].name}}</p>
+			<p style="font-size: 20px;">{{game[4]}}</p>
+			<br>
+		{% endfor %}
+
+		<div class="columns">
+        {% for key,c in chapeau %}
+			<div class="column">
+				<table class="table">
+					<thead>
+						<tr style="background-color: #ff0000;">
+							<th>Chapeau {{key + 1}}</th>
+						</tr>
+					</thead>
+					<tbody>
+                        {% for team in c %}
+						<tr style="background-color: #ff9900;">
+							<th>
+								<p>{{team.name}}</p>
+							</th>
+						</tr>
+                        {% endfor %}
+					</tbody>
+				</table>
+			</div>
+            {% endfor %}
+		</div>
+
+        <div class="columns">
+        {% for key,p in poule %}
+			<div class="column">
+				<table class="table">
+					<thead>
+						<tr style="background-color: #ff0000;">
+							<th>Groupe {{key + 1}}</th>
+						</tr>
+					</thead>
+					<tbody>
+                        {% for team in p %}
+                         
+						<tr style="background-color: #ff9900;">
+							<th>
+								<p>{{team.name}}</p>
+							</th>
+						</tr>
+                        {% endfor %}
+					</tbody>
+				</table>
+			</div>
+            {% endfor %}
+		</div>
+	{% endif %}
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Competition - CASN{% endblock %}
+
+{% block body %}
+<h1 class="title is-1" style="text-align: center; margin-bottom: 50px;">Coupe d'Asie</h1>
+
+<form action="" method="post">
+<button class="button is-primary" style="cursor: pointer; margin-bottom: 150px;" type="submit" name="submit">Simuler</button>
+</form>
+
+
+{% if gameDemi != [] %}
+<h3 class="title is-3" style="text-align: center;">Demi Final</h3>
+<table style="width: 100%;" class="table">
+    <thead>
+      <tr>
+        <th>Match</th>
+      </tr>
+    </thead>
+    <tbody>
+        {% for value in gameDemi %}
+    <tr>
+        <th style="display: flex; justify-content: space-around;">
+             <p>{{value[0].name}}</p> 
+             <p>{{value[1]}}</p> 
+             <p>-</p> 
+             <p>{{value[2]}}</p> 
+             <p>{{value[3].name}}</p> 
+             <p>{{value[4]}}</p> 
+        </th>
+    </tr>
+        {% endfor %}
+    </tbody>
+  </table>
+
+  <h3 class="title is-3" style="text-align: center;">Final</h3>
+  <div style="border: 2px solid rgb(243, 243, 243); box-shadow: 10px 5px 5px black;">
+  <div style="width: 100%; display: flex; justify-content: space-around;">
+    <p>{{gameFinal[0].name}}</p>
+    <p>{{gameFinal[1]}}</p>
+    <p>-</p>
+    <p>{{gameFinal[2]}}</p>
+    <p>{{gameFinal[3].name}}</p>
+</div>
+<h3 class="title is-3" style="text-align: center;">{{gameFinal[4]}}</h3>
+</div>
+{% endif %}
+
+{% endblock %}

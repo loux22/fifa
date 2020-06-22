@@ -1,0 +1,13 @@
+.grid{
+    display: grid;
+    grid-template-columns: 25% 25% 25% 25%;
+}
+
+.grid_groupe{
+    display: grid;
+    grid-template-columns: 25% 25% 25% 25%;
+}
+
+.content-table thead .groupe{
+    background-color: blue;
+}

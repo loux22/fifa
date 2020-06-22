@@ -1,0 +1,71 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Classement{% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="{{ asset('css/ranking.css') }}">
+{% endblock %}
+
+{% block body %}
+<h1 class="title is-1" style="text-align: center; padding-bottom: 20px;">Classement FIFA</h1>
+
+<table class="table" >
+    <thead>
+        <tr>
+            <th>Rang</th>
+            <th style="padding-left: 200px;">Team</th>
+            <th style="padding-left: 200px;">Continent</th>
+            <th style="padding-left: 200px;">Points</th>
+            <th style="padding-left: 200px;">Valeur</th>
+            <th style="padding-left: 200px;">Point à rajouter</th>
+
+        </tr>
+    </thead>
+    <tbody>
+        <form action="" method="post">
+        {% for key,value in team_ranking %}
+
+        {% if value.myTeam == false %}
+        
+
+            {% if value.continent.name == 'europe' %}
+            <tr style="background-color: rgb(18, 1, 63); color:white;">
+
+            {% elseif value.continent.name == 'afrique' %}
+            <tr style="background-color: #fbff00;">   
+
+            {% elseif value.continent.name == 'amerique' %}
+            <tr style="background-color: #7c0000; color:white;"> 
+
+            {% elseif value.continent.name == 'asie' %}
+            <tr style="background-color: #ffffff;">     
+
+            {% elseif value.continent.name == 'oceanie' %}
+            <tr style="background-color: #00c40a; color:white;">
+                
+            {% endif %}
+        
+
+        {% else %}
+        <tr class="is-selected">
+        {% endif %}
+        {% if value.continent.name == 'asie' %}
+            <th>{{key + 1}}</th>
+        {% else %}
+            <th style="color:white;">{{key + 1}}</th>
+        {% endif %}
+            
+            <td style="padding-left: 200px;">{{value.name}}</td>
+            <td style="padding-left: 200px;">{{value.continent.name}}</td>
+            <td style="padding-left: 200px;">{{value.scoring}}</td>
+            <td style="padding-left: 200px;">{{value.value}}</td>
+            <td style="padding-left: 200px;"><input class="input is-danger is-small is-rounded" name="{{value.id}}"type="number"></td>
+        </tr>
+
+        {% endfor %}
+    </tbody>
+</table>
+
+<button class="button is-success" type="submit" name="submit">Valider</button>
+</form>
+{% endblock %}
