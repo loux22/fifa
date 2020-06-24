@@ -6,7 +6,9 @@ use App\Entity\Team;
 use App\Entity\Promoter;
 use App\Entity\Continent;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 
 class EuroController extends AbstractController
 {
@@ -116,7 +118,7 @@ class EuroController extends AbstractController
     /**
      * @Route("/euro", name="euro")
      */
-    public function euro()
+    public function euro(SessionInterface $session, Request $request)
     {
         $repoPromoter = $this->getDoctrine()->getRepository(Promoter::class);
         $repo = $this->getDoctrine()->getRepository(Team::class);
@@ -124,6 +126,7 @@ class EuroController extends AbstractController
         $euro = $repoEuro->findBy([
             'name' => 'europe'
         ]);
+        $myTeam = $request->request->all();
         $promoter = []; // contient le/les pays organisateur
         $barrageOne = [];
         $barrageOne[0] = [];
@@ -141,9 +144,11 @@ class EuroController extends AbstractController
         $chapeau[3] = [];
 
         $poule = [];
+
+        $button = 1;
         if (isset($_POST['simulate'])) {
             $yearsTirage = $this->drawPromoter();
-            $promoter = $repoPromoter -> findBy(['years' => $yearsTirage]);
+            $promoter = $repoPromoter->findBy(['years' => $yearsTirage]);
             // $promoter = $repoPromoter->findBy(['years' => 2048]);
             $promoterId = [];
             foreach ($promoter as $key => $value) {
@@ -172,25 +177,66 @@ class EuroController extends AbstractController
             shuffle($barrageOne[0]);
             shuffle($barrageOne[1]);
             foreach ($barrageOne[0] as $key => $team) {
-                $gameBarrageOne[$key] = $this->game($team, $barrageOne[1][$key]);
-                $barrageTwo[1][] = $gameBarrageOne[$key][5];
-                $this -> point($gameBarrageOne[$key][6], 2);
+                if ($team -> getMyTeam() || $barrageOne[1][$key] -> getMyTeam()){
+                    $gameBarrageOne[$key][0] = $team;
+                    $gameBarrageOne[$key][1] = $barrageOne[1][$key];
+                    $gameBarrageOne[$key][2] = "match";
+                }else{
+                    $gameBarrageOne[$key] = $this->game($team, $barrageOne[1][$key]);
+                    $barrageTwo[1][] = $gameBarrageOne[$key][5];
+                    $this->point($gameBarrageOne[$key][6], 2);
+                }
             }
+            $session->set('barrageTwo1', $barrageTwo[0]);
+            $session->set('barrageTwo2', $barrageTwo[1]);
+            $session->set('promoter', $promoter);
+            $session->set('rankTeam', $rankTeam);
+            $session->set('button', 2);
+            $button = $session->get('button', []);
+        }
 
+        if (isset($_POST['barrage2'])) {
+            
+            $barrageTwo[0] = $session->get('barrageTwo1', []);
+            $barrageTwo[1] = $session->get('barrageTwo2', []);
+            $promoter = $session->get('promoter', []);
+            $rankTeam = $session->get('rankTeam', []);
+            if(isset($myTeam['win'])){
+                $barrageTwo[1][] = $repo -> find($myTeam['win']);
+            }
             shuffle($barrageTwo[0]);
             shuffle($barrageTwo[1]);
             foreach ($barrageTwo[1] as $key => $team) {
-                $gameBarrageTwo[$key] = $this->game($team, $barrageTwo[0][$key]);
-                $this -> point($gameBarrageTwo[$key][6], 5);
-                $rankTeam[] = $gameBarrageTwo[$key][5];
+                if ($team -> getMyTeam() || $barrageTwo[0][$key] -> getMyTeam()){
+                    $gameBarrageTwo[$key][0] = $team;
+                    $gameBarrageTwo[$key][1] = $barrageTwo[0][$key];
+                    $gameBarrageTwo[$key][2] = "match";
+                }else{
+                    $gameBarrageTwo[$key] = $this->game($team, $barrageTwo[0][$key]);
+                    $this->point($gameBarrageTwo[$key][6], 5);
+                    $rankTeam[] = $gameBarrageTwo[$key][5];
+                }
+                
             }
             $gameBarrageTwo[8] = $this->game($barrageTwo[0][8], $barrageTwo[0][9]);
             $gameBarrageTwo[9] = $this->game($barrageTwo[0][10], $barrageTwo[0][11]);
             $rankTeam[] = $gameBarrageTwo[8][5];
-            $this -> point($gameBarrageTwo[8][6], 5);
+            $this->point($gameBarrageTwo[8][6], 5);
             $rankTeam[] = $gameBarrageTwo[9][5];
-            $this -> point($gameBarrageTwo[9][6], 5);
+            $this->point($gameBarrageTwo[9][6], 5);
+            $session->set('button', 3);
+            $button = $session->get('button', []);
+            
+            $session->set('rankTeam', $rankTeam);
+        }
 
+        if (isset($_POST['tirage'])) {
+            $promoter = $session->get('promoter', []);
+            $rankTeam = $session->get('rankTeam', []);
+            if(isset($myTeam['win'])){
+                $rankTeam[] = $repo -> find($myTeam['win']);
+            }
+            
             foreach ($rankTeam as $key => $rank) {
                 foreach ($rankTeam as $keys => $value) {
                     if (($keys + 1) < count($rankTeam)) {
@@ -202,18 +248,18 @@ class EuroController extends AbstractController
                     }
                 }
             }
-
             foreach ($promoter as $key => $value) {
-                $chapeau[0][] = $value -> getTeam();
+                $chapeau[0][] = $value->getTeam();
             }
+            
             foreach ($rankTeam as $key => $team) {
                 if (count($chapeau[0]) <= 3) {
                     $chapeau[0][] = $team;
-                }else if(count($chapeau[1]) <= 3){
+                } else if (count($chapeau[1]) <= 3) {
                     $chapeau[1][] = $team;
-                }else if(count($chapeau[2]) <= 3){
+                } else if (count($chapeau[2]) <= 3) {
                     $chapeau[2][] = $team;
-                }else{
+                } else {
                     $chapeau[3][] = $team;
                 }
             }
@@ -221,13 +267,17 @@ class EuroController extends AbstractController
             shuffle($chapeau[1]);
             shuffle($chapeau[2]);
             shuffle($chapeau[3]);
-
+            
             foreach ($chapeau as $key => $c) {
                 foreach ($c as $keys => $team) {
-                        $poule[$key][] = $chapeau[$keys][$key];
+                    $poule[$key][] = $chapeau[$keys][$key];
                 }
             }
+            $session->set('button', 4);
+            $button = $session->get('button', []);
         }
+
+
 
         return $this->render('euro/euro.html.twig', [
             "promoter" => $promoter,
@@ -236,7 +286,8 @@ class EuroController extends AbstractController
             "gameBarrageTwo" => $gameBarrageTwo,
             "rankTeam" => $rankTeam,
             "chapeau" => $chapeau,
-            "poule" => $poule
+            "poule" => $poule,
+            "button" => $button
         ]);
     }
 

@@ -11,28 +11,36 @@
 		}
 	</style>
 	{# {{dump(barrageTwo)}}
-	{{dump(gameBarrageTwo)}}
-	{{dump(rankTeam)}}
-	{{dump(chapeau)}}
-    {{dump(poule)}} #}
-
+		{{dump(gameBarrageTwo)}}
+		{{dump(rankTeam)}}
+		{{dump(chapeau)}}
+	    {{dump(poule)}} #}
 
 	<h1 class="title is-1" style="text-align: center; margin-bottom: 50px;">Euro</h1>
-
-	<form action="" method="post">
-		<button class="button is-primary" style="cursor: pointer;" type="submit" name="simulate">Simuler</button>
-	</form>
-
-	{% if promoter != [] %}
-		<h3 class="title is-3" style="margin-bottom: 50px;">Organisateur :
-			{% for p in promoter %}
-				{{p.team.name}}
-			{% endfor %}
-		</h3>
-
+	<h3 class="title is-2" style="margin-bottom: 50px;">Organisateur :
+				{% for p in promoter %}
+					{{p.team.name}}
+				{% endfor %}
+			</h3>
+	{% if button == 1 %}
+		<form action="" method="post">
+			<button class="button is-primary" style="cursor: pointer;" type="submit" name="simulate">Simuler</button>
+		</form>
+	{% elseif button == 2 %}
 		<h3 class="title is-3" style="margin-bottom: 50px;">Barrage 1 :
 		</h3>
 		{% for game in gameBarrageOne %}
+			{# {{dump(game)}} #}
+			{% if game[2] == "match" %}
+				<form action="" method="post">
+					<input type="hidden" name="win" value="{{game[0].id}}">
+					<button type="submit" name="barrage2">{{game[0].name}}</button>
+				</form>
+				<form action="" method="post">
+					<input type="hidden" name="win" value="{{game[1].id}}">
+					<button type="submit" name="barrage2">{{game[1].name}}</button>
+				</form>
+			{% else %}
 			<p style="font-size: 15px;">{{game[0].name}}
 				{{game[1]}}
 				-
@@ -40,66 +48,87 @@
 				{{game[3].name}}</p>
 			<p style="font-size: 20px;">{{game[4]}}</p>
 			<br>
+			{% endif %}
 		{% endfor %}
-
-
-		<h3 class="title is-3" style="margin-bottom: 50px;">Barrage 2 :
-		</h3>
-		{% for game in gameBarrageTwo %}
-			<p style="font-size: 15px;">{{game[0].name}}
-				{{game[1]}}
-				-
-				{{game[2]}}
-				{{game[3].name}}</p>
-			<p style="font-size: 20px;">{{game[4]}}</p>
-			<br>
-		{% endfor %}
-
-		<div class="columns">
-        {% for key,c in chapeau %}
-			<div class="column">
-				<table class="table">
-					<thead>
-						<tr style="background-color: #ff0000;">
-							<th>Chapeau {{key + 1}}</th>
-						</tr>
-					</thead>
-					<tbody>
-                        {% for team in c %}
-						<tr style="background-color: #ff9900;">
-							<th>
-								<p>{{team.name}}</p>
-							</th>
-						</tr>
-                        {% endfor %}
-					</tbody>
-				</table>
+		<form action="" method="post">
+			<button class="button is-primary" style="cursor: pointer;" type="submit" name="barrage2">Suivant Barrage 2</button>
+		</form>
+	{% elseif button == 3 %}
+			<h3 class="title is-3" style="margin-bottom: 50px;">Barrage 2 :
+			</h3>
+			<form action="" method="post">
+			<button class="button is-primary" style="cursor: pointer;" type="submit" name="tirage">Suivant tirage</button>
+		</form>
+			{% for game in gameBarrageTwo %}
+			{% if game[2] == "match" %}
+				<form action="" method="post">
+					<input type="hidden" name="win" value="{{game[0].id}}">
+					<button type="submit" name="tirage">{{game[0].name}}</button>
+				</form>
+				<form action="" method="post">
+					<input type="hidden" name="win" value="{{game[1].id}}">
+					<button type="submit" name="tirage">{{game[1].name}}</button>
+				</form>
+			{% else %}
+				<p style="font-size: 15px;">{{game[0].name}}
+					{{game[1]}}
+					-
+					{{game[2]}}
+					{{game[3].name}}</p>
+				<p style="font-size: 20px;">{{game[4]}}</p>
+				<br>
+			{% endif %}
+			{% endfor %}
+	{% elseif button == 4 %}
+		{% if promoter != [] %}
+			<div class="columns">
+				{% for key,c in chapeau %}
+					<div class="column">
+						<table class="table">
+							<thead>
+								<tr style="background-color: #ff0000;">
+									<th>Chapeau
+										{{key + 1}}</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for team in c %}
+									<tr style="background-color: #ff9900;">
+										<th>
+											<p>{{team.name}}</p>
+										</th>
+									</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+					</div>
+				{% endfor %}
 			</div>
-            {% endfor %}
-		</div>
 
-        <div class="columns">
-        {% for key,p in poule %}
-			<div class="column">
-				<table class="table">
-					<thead>
-						<tr style="background-color: #ff0000;">
-							<th>Groupe {{key + 1}}</th>
-						</tr>
-					</thead>
-					<tbody>
-                        {% for team in p %}
-                         
-						<tr style="background-color: #ff9900;">
-							<th>
-								<p>{{team.name}}</p>
-							</th>
-						</tr>
-                        {% endfor %}
-					</tbody>
-				</table>
+			<div class="columns">
+				{% for key,p in poule %}
+					<div class="column">
+						<table class="table">
+							<thead>
+								<tr style="background-color: #ff0000;">
+									<th>Groupe
+										{{key + 1}}</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for team in p %}
+
+									<tr style="background-color: #ff9900;">
+										<th>
+											<p>{{team.name}}</p>
+										</th>
+									</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+					</div>
+				{% endfor %}
 			</div>
-            {% endfor %}
-		</div>
+		{% endif %}
 	{% endif %}
 {% endblock %}
