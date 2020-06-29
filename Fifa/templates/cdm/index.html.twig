@@ -1,0 +1,203 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Coupe du monde
+{% endblock %}
+
+{% block body %}
+	{# {{dump(rankTeam)}}
+	{{dump(chapeau)}}
+	{{dump(poule)}} #}
+	{# {{dump(barrageEurope1)}}
+		{{dump(barrageEurope2)}} #}
+	<style>
+		p {
+			font-weight: bold;
+			font-size: 20px;
+		}
+	</style>
+	<h1 class="title is-1" style="text-align: center; margin-bottom: 50px;">Coupe du monde</h1>
+	<h3 class="title is-2" style="margin-bottom: 50px;">Organisateur :
+		{% for p in promoter %}
+			{{p.team.name}}
+		{% endfor %}
+	</h3>
+
+	{% if button == 1 %}
+	<form action="" method="post">
+		<button class="button is-primary" style="cursor: pointer;" type="submit" name="simulate">Simuler</button>
+	</form>
+	{% endif %}
+	
+	<form action="" method="post">
+			<button class="button is-primary" style="cursor: pointer;" type="submit" name="barrage2">Suivant Barrage 2</button>
+	</form>
+
+	{% if barrageOceanie != null %}
+	{% if barrageOceanie[0] != null %}
+
+		<h3 class="title is-3" style="margin-bottom: 50px;">Barrage Oceanie :
+		</h3>
+		<p style="font-size: 15px;">{{barrageOceanie[0][0].name}}
+			{{barrageOceanie[0][1]}}
+			-
+			{{barrageOceanie[0][2]}}
+			{{barrageOceanie[0][3].name}}</p>
+		<p style="font-size: 20px;">{{barrageOceanie[0][4]}}</p>
+		<br>
+		<br>
+		<br>
+	{% endif %}
+	{% endif %}
+
+	{% if barrageOneAsie != null %}
+	{% if barrageOneAsie[0] != null %}
+
+		<h3 class="title is-3" style="margin-bottom: 50px;">Barrage 1 Asie :
+		</h3>
+		{% for game in barrageOneAsie[0] %}
+			<p style="font-size: 15px;">{{game[0].name}}
+				{{game[1]}}
+				-
+				{{game[2]}}
+				{{game[3].name}}</p>
+			<p style="font-size: 20px;">{{game[4]}}</p>
+			<br>
+		{% endfor %}
+
+		<h3 class="title is-3" style="margin-bottom: 50px;">Barrage 2 Asie :
+		</h3>
+		<p style="font-size: 15px;">{{barrageTwoAsie[0][0].name}}
+			{{barrageTwoAsie[0][1]}}
+			-
+			{{barrageTwoAsie[0][2]}}
+			{{barrageTwoAsie[0][3].name}}</p>
+		<p style="font-size: 20px;">{{barrageTwoAsie[0][4]}}</p>
+		<br>
+		<br>
+		<br>
+	{% endif %}
+	{% endif %}
+
+	{% if barrageOneAfrique != null %}
+		<h3 class="title is-3" style="margin-bottom: 50px;">Barrage 1 Afrique :
+		</h3>
+		{% for game in barrageOneAfrique %}
+			<p style="font-size: 15px;">{{game[0].name}}
+				{{game[1]}}
+				-
+				{{game[2]}}
+				{{game[3].name}}</p>
+			<p style="font-size: 20px;">{{game[4]}}</p>
+			<br>
+		{% endfor %}
+		{% if barrageTwoAfrique != [] %}
+			<h3 class="title is-3" style="margin-bottom: 50px;">Barrage 2 Afrique :
+			</h3>
+			{% for game in barrageTwoAfrique %}
+				<p style="font-size: 15px;">{{game[0].name}}
+					{{game[1]}}
+					-
+					{{game[2]}}
+					{{game[3].name}}</p>
+				<p style="font-size: 20px;">{{game[4]}}</p>
+				<br>
+			{% endfor %}
+		{% endif %}
+		<br>
+		<br>
+		<br>
+
+		{% if barrageAmerique != null %}
+			<h3 class="title is-3" style="margin-bottom: 50px;">Barrage Amerique :
+			</h3>
+			{% for game in barrageAmerique %}
+				<p style="font-size: 15px;">{{game[0].name}}
+					{{game[1]}}
+					-
+					{{game[2]}}
+					{{game[3].name}}</p>
+				<p style="font-size: 20px;">{{game[4]}}</p>
+				<br>
+			{% endfor %}
+			<br>
+			<br>
+		{% endif %}
+
+		{% if barrageEurope1 != null %}
+			<h3 class="title is-3" style="margin-bottom: 50px;">Barrage Europe 1 :
+			</h3>
+			{% for game in barrageEurope1 %}
+				<p style="font-size: 15px;">{{game[0].name}}
+					{{game[1]}}
+					-
+					{{game[2]}}
+					{{game[3].name}}</p>
+				<p style="font-size: 20px;">{{game[4]}}</p>
+				<br>
+			{% endfor %}
+
+			<h3 class="title is-3" style="margin-bottom: 50px;">Barrage Europe 2 :
+			</h3>
+			{% for game in barrageEurope2 %}
+				<p style="font-size: 15px;">{{game[0].name}}
+					{{game[1]}}
+					-
+					{{game[2]}}
+					{{game[3].name}}</p>
+				<p style="font-size: 20px;">{{game[4]}}</p>
+				<br>
+			{% endfor %}
+		{% endif %}
+		{% if promoter != [] %}
+			<div class="columns">
+				{% for key,c in chapeau %}
+					<div class="column">
+						<table class="table">
+							<thead>
+								<tr style="background-color: #ff0000;">
+									<th>Chapeau
+										{{key + 1}}</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for team in c %}
+									<tr style="background-color: #ff9900;">
+										<th>
+											<p>{{team.name}}</p>
+										</th>
+									</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+					</div>
+				{% endfor %}
+			</div>
+
+			<div class="columns">
+				{% for key,p in poule %}
+					<div class="column">
+						<table class="table">
+							<thead>
+								<tr style="background-color: #ff0000;">
+									<th>Groupe
+										{{key + 1}}</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for team in p %}
+
+									<tr style="background-color: #ff9900;">
+										<th>
+											<p>{{team.name}}</p>
+										</th>
+									</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+					</div>
+				{% endfor %}
+			</div>
+		{% endif %}
+	{% endif %}
+
+{% endblock %}
