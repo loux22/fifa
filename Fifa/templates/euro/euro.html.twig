@@ -34,11 +34,19 @@
 			{% if game[2] == "match" %}
 				<form action="" method="post">
 					<input type="hidden" name="win" value="{{game[0].id}}">
-					<button type="submit" name="barrage2">{{game[0].name}}</button>
+					{% if game[0].myTeam %}
+					<button class="button is-success" type="submit" name="barrage2">{{game[0].name}}</button>
+					{% else %}
+					<button class="button is-warning" type="submit" name="barrage2">{{game[0].name}}</button>	
+					{% endif %}
 				</form>
 				<form action="" method="post">
 					<input type="hidden" name="win" value="{{game[1].id}}">
-					<button type="submit" name="barrage2">{{game[1].name}}</button>
+					{% if game[1].myTeam %}
+					<button class="button is-success" type="submit" name="barrage2">{{game[1].name}}</button>
+					{% else %}
+					<button class="button is-warning" type="submit" name="barrage2">{{game[1].name}}</button>	
+					{% endif %}
 				</form>
 			{% else %}
 			<p style="font-size: 15px;">{{game[0].name}}
@@ -63,11 +71,19 @@
 			{% if game[2] == "match" %}
 				<form action="" method="post">
 					<input type="hidden" name="win" value="{{game[0].id}}">
-					<button type="submit" name="tirage">{{game[0].name}}</button>
+					{% if game[0].myTeam %}
+					<button class="button is-success" type="submit" name="tirage">{{game[0].name}}</button>
+					{% else %}
+					<button class="button is-warning" type="submit" name="tirage">{{game[0].name}}</button>	
+					{% endif %}
 				</form>
 				<form action="" method="post">
 					<input type="hidden" name="win" value="{{game[1].id}}">
-					<button type="submit" name="tirage">{{game[1].name}}</button>
+					{% if game[1].myTeam %}
+					<button class="button is-success" type="submit" name="tirage">{{game[1].name}}</button>
+					{% else %}
+					<button class="button is-warning" type="submit" name="tirage">{{game[1].name}}</button>	
+					{% endif %}
 				</form>
 			{% else %}
 				<p style="font-size: 15px;">{{game[0].name}}
@@ -84,16 +100,16 @@
 			<div class="columns">
 				{% for key,c in chapeau %}
 					<div class="column">
-						<table class="table">
+						<table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
 							<thead>
-								<tr style="background-color: #ff0000;">
-									<th>Chapeau
+								<tr style="background-color: #000147;">
+									<th style="color: white;">Chapeau
 										{{key + 1}}</th>
 								</tr>
 							</thead>
 							<tbody>
 								{% for team in c %}
-									<tr style="background-color: #ff9900;">
+									<tr>
 										<th>
 											<p>{{team.name}}</p>
 										</th>
@@ -108,17 +124,17 @@
 			<div class="columns">
 				{% for key,p in poule %}
 					<div class="column">
-						<table class="table">
+						<table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
 							<thead>
 								<tr style="background-color: #ff0000;">
-									<th>Groupe
+									<th style="color: white;">Groupe
 										{{key + 1}}</th>
 								</tr>
 							</thead>
 							<tbody>
 								{% for team in p %}
 
-									<tr style="background-color: #ff9900;">
+									<tr>
 										<th>
 											<p>{{team.name}}</p>
 										</th>

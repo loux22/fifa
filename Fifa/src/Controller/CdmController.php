@@ -6,18 +6,21 @@ use App\Entity\Team;
 use App\Entity\Promoter;
 use App\Entity\Continent;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 
 class CdmController extends AbstractController
 {
     /**
      * @Route("/cdm", name="cdm")
      */
-    public function cdm()
+    public function cdm(SessionInterface $session, Request $request)
     {
         $repoPromoter = $this->getDoctrine()->getRepository(Promoter::class);
         $repo = $this->getDoctrine()->getRepository(Team::class);
         $repoContinent = $this->getDoctrine()->getRepository(Continent::class);
+        $myTeam = $request->request->all();
         $promoter = [];
         $barrageOceanie = [];
         $barrageOneAsie = [];
@@ -31,10 +34,16 @@ class CdmController extends AbstractController
         $chapeau = [];
         $poule = [];
         $button = 1;
+        $office = [];
+        $alphabetical = [];
         if (isset($_POST['simulate'])) {
-            $button = 2;
+            $session->clear();
+            $session->set('button', 2);
+            $button = $session->get('button', []);
             $promoter = $this->displayPromoter($repoPromoter);
             $teamOceanie = $this->barrageOceanie($promoter, $repoContinent, $repo);
+            $session->set('promoter', $promoter);
+            $teamEurope = $this->barrageEurope($promoter, $repoContinent, $repo, $session, $myTeam);
             if ($teamOceanie != null) {
                 $rankTeam[] = $teamOceanie[0];
             }
@@ -68,26 +77,47 @@ class CdmController extends AbstractController
             foreach ($teamAmerique[2] as $key => $team) {
                 $rankTeam[] = $team;
             }
-
-            $teamEurope = $this->barrageEurope($promoter, $repoContinent, $repo);
             foreach ($teamEurope[1] as $key => $team) {
-               $barrageEurope1[] = $team;
+                $barrageEurope1[] = $team;
             }
+            foreach ($teamEurope[3] as $key => $team) {
+                $rankTeam[] = $team;
+                $office[] = $team;
+            }
+            $session->set('rankTeam', $rankTeam);
+            $session->set('barrageEurope1', $barrageEurope1);
+        }
+        if (isset($_POST['barrage2'])) {
+            $teamEurope = $this->barrageEurope($promoter, $repoContinent, $repo, $session, $myTeam);
+            $rankTeam =  $session->get('rankTeam', []);
+            $promoter =  $session->get('promoter', []);
+            $session->set('button', 3);
+            $button = $session->get('button', []);
+            $barrageEurope1 = $session->get('barrageEurope1', []);
             foreach ($teamEurope[2] as $key => $team) {
                 $barrageEurope2[] = $team;
             }
             foreach ($teamEurope[0] as $key => $team) {
                 $rankTeam[] = $team;
             }
-            foreach ($teamEurope[3] as $key => $team) {
-                $rankTeam[] = $team;
+            $session->set('rankTeam', $rankTeam);
+        }
+
+        if (isset($_POST['tirage'])) {
+            $session->set('button', 4);
+            $button = $session->get('button', []);
+            $promoter =  $session->get('promoter', []);
+            $rankTeam =  $session->get('rankTeam', []);
+            if (isset($myTeam['win'])) {
+                $rankTeam[] = $repo->find($myTeam['win']);
             }
-            
-            $tirage = $this -> tirage($promoter, $rankTeam);
+            $tirage = $this->tirage($promoter, $rankTeam);
             $rankTeam = $tirage[0];
             $chapeau = $tirage[1];
             $poule = $tirage[2];
+            $alphabetical = $this -> sortAlphabetical($promoter, $rankTeam);
         }
+
 
         return $this->render('cdm/index.html.twig', [
             "promoter" => $promoter,
@@ -102,11 +132,37 @@ class CdmController extends AbstractController
             "rankTeam" => $rankTeam,
             "poule" => $poule,
             "chapeau" => $chapeau,
-            "button" => $button
+            "button" => $button,
+            "office" => $office,
+            "alphabetical" => $alphabetical
         ]);
     }
 
-    public function tirage($promoter, $rankTeam){
+    public function sortAlphabetical($promoter, $rankTeam)
+    {
+        $alphabetical = [];
+        foreach ($promoter as $key => $team) {
+            $alphabetical[] = $team -> getTeam();
+        }
+        foreach ($rankTeam as $key => $team) {
+            $alphabetical[] = $team;
+        }
+        foreach ($alphabetical as $key => $rank) {
+            foreach ($alphabetical as $keys => $value) {
+                if (($keys + 1) < count($alphabetical)) {
+                    if ($alphabetical[$keys + 1]->getName() < $alphabetical[$keys]->getName()) {
+                        $remp = $alphabetical[$keys];
+                        $alphabetical[$keys] = $alphabetical[$keys + 1];
+                        $alphabetical[$keys + 1] = $remp;
+                    }
+                }
+            }
+        }
+        return $alphabetical; 
+    }
+
+    public function tirage($promoter, $rankTeam)
+    {
         $chapeau = [];
         $chapeau[0] = [];
         $chapeau[1] = [];
@@ -125,16 +181,16 @@ class CdmController extends AbstractController
             }
         }
         foreach ($promoter as $key => $team) {
-            $chapeau[0][] = $team -> getTeam();
+            $chapeau[0][] = $team->getTeam();
         }
         foreach ($rankTeam as $key => $team) {
             if (count($chapeau[0]) < 8) {
                 $chapeau[0][] = $team;
-            }else if (count($chapeau[1]) < 8){
+            } else if (count($chapeau[1]) < 8) {
                 $chapeau[1][] = $team;
-            }else if (count($chapeau[2]) < 8){
+            } else if (count($chapeau[2]) < 8) {
                 $chapeau[2][] = $team;
-            }else{
+            } else {
                 $chapeau[3][] = $team;
             }
         }
@@ -150,7 +206,7 @@ class CdmController extends AbstractController
         return [$rankTeam, $chapeau, $poule];
     }
 
-    public function barrageEurope($promoter, $repoContinent, $repo)
+    public function barrageEurope($promoter, $repoContinent, $repo, $session, $myTeam)
     {
         $barrage = [];
         $barrage[0] = [];
@@ -161,39 +217,61 @@ class CdmController extends AbstractController
         $game1 = [];
         $game2 = [];
         $qualif = [];
-        $allTeams = $this->teamWithoutPromoter($promoter, "europe", $repoContinent, $repo);
-        foreach ($allTeams as $key => $team) {
-            $teams[] = $team;
-        }
-        foreach ($teams as $key => $team) {
-            if (count($barrage[0]) < 8){
-                $barrage[0][] = $team;
-            }else if (count($barrage[1]) < 8){
-                $barrage[1][] = $team;
-            }else if (count($barrage2[1]) < 12){
-                $barrage2[1][] = $team;
-            }else{
-                $office[] = $team;
+        if (isset($_POST['simulate'])) {
+            $promoter = $session->get('promoter', []);
+            $allTeams = $this->teamWithoutPromoter($promoter, "europe", $repoContinent, $repo);
+            foreach ($allTeams as $key => $team) {
+                $teams[] = $team;
             }
+            foreach ($teams as $key => $team) {
+                if (count($barrage[0]) < 8) {
+                    $barrage[0][] = $team;
+                } else if (count($barrage[1]) < 8) {
+                    $barrage[1][] = $team;
+                } else if (count($barrage2[1]) < 12) {
+                    $barrage2[1][] = $team;
+                } else {
+                    $office[] = $team;
+                }
+            }
+            shuffle($barrage[0]);
+            shuffle($barrage[1]);
+            foreach ($barrage[0] as $key => $team) {
+                if ($team->getMyTeam() || $barrage[1][$key]->getMyTeam()) {
+                    $game1[$key][0] = $team;
+                    $game1[$key][1] = $barrage[1][$key];
+                    $game1[$key][2] = "match";
+                } else {
+                    $game1[$key] = $this->game($team, $barrage[1][$key]);
+                    $barrage2[0][] = $game1[$key][5];
+                }
+            }
+            $session->set('barrage2', $barrage2);
+            return [$qualif, $game1, $game2, $office];
         }
-        shuffle($barrage[0]);
-        shuffle($barrage[1]);
-        foreach ($barrage[0] as $key => $team) {
-            $game1[] = $this -> game($team, $barrage[1][$key]);
-            $barrage2[0][] = $game1[$key][5];
+        if (isset($_POST['barrage2'])) {
+            $barrage2 =  $session->get('barrage2', []);
+            if (isset($myTeam['win'])) {
+                $barrage2[0][] = $repo->find($myTeam['win']);
+            }
+            shuffle($barrage2[0]);
+            shuffle($barrage2[1]);
+            foreach ($barrage2[0] as $key => $team) {
+                if ($team->getMyTeam() || $barrage2[1][$key]->getMyTeam()) {
+                    $game2[$key][0] = $team;   
+                    $game2[$key][1] = $barrage2[1][$key];
+                    $game2[$key][2] = "match";
+                } else {
+                    $game2[$key] = $this->game($team, $barrage2[1][$key]);
+                    $qualif[] = $game2[$key][5];
+                }
+            }
+            $game2[8] = $this->game($barrage2[1][8], $barrage2[1][9]);
+            $game2[9] = $this->game($barrage2[1][10], $barrage2[1][11]);
+            $qualif[] = $game2[8][5];
+            $qualif[] = $game2[9][5];
+            return [$qualif, $game1, $game2, $office];
         }
-        shuffle($barrage2[0]);
-        shuffle($barrage2[1]);
-        foreach ($barrage2[0] as $key => $team) {
-            $game2[] = $this -> game($team, $barrage2[1][$key]);
-            $qualif[] = $game2[$key][5];
-        }
-        $game2[8] = $this->game($barrage2[1][8], $barrage2[1][9]);
-        $game2[9] = $this->game($barrage2[1][10], $barrage2[1][11]);
-        $qualif[] = $game2[8][5];
-        $qualif[] = $game2[9][5];
-
-        return [$qualif, $game1, $game2, $office];
     }
 
     public function barrageAmerique($promoter, $repoContinent, $repo)
@@ -206,22 +284,21 @@ class CdmController extends AbstractController
         $qualif = [];
         $allTeams = $this->teamWithoutPromoter($promoter, "amerique", $repoContinent, $repo);
         foreach ($allTeams as $key => $team) {
-            $teams[] = $team; 
+            $teams[] = $team;
         }
         foreach ($teams as $key => $team) {
             if (count($barrage[0]) < 4) {
                 $barrage[0][] = $team;
-            }else if (count($barrage[1]) < 4) {
+            } else if (count($barrage[1]) < 4) {
                 $barrage[1][] = $team;
-            }
-            else{
+            } else {
                 $office[] = $team;
             }
         }
         shuffle($barrage[0]);
         shuffle($barrage[1]);
         foreach ($barrage[0] as $key => $team) {
-            $game[] = $this -> game($team, $barrage[1][$key]);
+            $game[] = $this->game($team, $barrage[1][$key]);
             $qualif[] = $game[$key][5];
         }
 
@@ -254,46 +331,46 @@ class CdmController extends AbstractController
                 $qualif[]  = $demi[$key][5];
             }
             return [$qualif, $demi];
-        }elseif (!isset($promoter[1]) && $promoter[0]->getTeam()->getContinent()->getName() == "afrique") {
+        } elseif (!isset($promoter[1]) && $promoter[0]->getTeam()->getContinent()->getName() == "afrique") {
             foreach ($teams as $key => $team) {
                 if ($key <= 1) {
                     $chapeau[0][] = $team;
-                }else {
+                } else {
                     $chapeau[1][] = $team;
                 }
             }
-            $demi[] = $this -> game($chapeau[0][0], $chapeau[0][1]);
+            $demi[] = $this->game($chapeau[0][0], $chapeau[0][1]);
             $chapeau[1][] = $demi[0][5];
             shuffle($chapeau[1]);
             foreach ($chapeau[1] as $key => $team) {
-                if($key % 2 == 0){
-                    $final[] = $this -> game($team, $chapeau[1][$key + 1]);
+                if ($key % 2 == 0) {
+                    $final[] = $this->game($team, $chapeau[1][$key + 1]);
                 }
             }
             foreach ($final as $key => $team) {
                 $qualif[] = $team[5];
             }
             return [$qualif, $demi, $final];
-        }else{
+        } else {
             foreach ($teams as $key => $team) {
                 if ($key <= 3) {
                     $chapeau[0][] = $team;
-                }else {
+                } else {
                     $chapeau[1][] = $team;
                 }
             }
             shuffle($chapeau[0]);
             foreach ($chapeau[0] as $key => $team) {
-                if($key % 2 == 0){
-                    $demi[] = $this -> game($team, $chapeau[0][$key + 1]);
+                if ($key % 2 == 0) {
+                    $demi[] = $this->game($team, $chapeau[0][$key + 1]);
                 }
             }
             $chapeau[1][] = $demi[0][5];
             $chapeau[1][] = $demi[1][5];
             shuffle($chapeau[1]);
             foreach ($chapeau[1] as $key => $team) {
-                if($key % 2 == 0){
-                    $final[] = $this -> game($team, $chapeau[1][$key + 1]);
+                if ($key % 2 == 0) {
+                    $final[] = $this->game($team, $chapeau[1][$key + 1]);
                 }
             }
             $qualif[] = $final[0][5];
