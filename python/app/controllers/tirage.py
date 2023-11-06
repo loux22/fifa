@@ -26,14 +26,14 @@ def tirage():
     if request.method == 'POST':
         n_team = int(request.form.get('n_team'))
         team_select = request.form.getlist('team_select')
-        for i in range (0, int(n_team/4)):
-            chapeau.append(team_select[4*i:4*(i+1)]) 
+        nb_team_by_chapeau = int(n_team/4)
+        for i in range (0, 4):
+            chapeau.append(team_select[nb_team_by_chapeau*i:nb_team_by_chapeau*(i+1)]) 
 
     poules = [chap.copy() for chap in chapeau]
     for chap in poules:
         random.shuffle(chap)
-
-    return render_template('pages/tirage.html', teams=teams, continent=continent, chapeau=chapeau, poules=poules)
+    return render_template('pages/tirage.html', teams=teams, continent=continent, chapeau=chapeau, poules=poules, nb_team_by_chapeau=nb_team_by_chapeau )
 
 
 
