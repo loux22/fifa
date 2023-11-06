@@ -14,6 +14,7 @@ def index():
 @fifa.route('/tirage', methods=['GET', 'POST'])
 def tirage():
     chapeau = []
+    nb_team_by_chapeau = 0
     continent = request.args.get('continent')
 
     teams = get_team_filtre()
@@ -21,7 +22,7 @@ def tirage():
     if not continent:
         continent = "tous"
     if not continent == "tous" :
-        teams = [dico for dico in teams if dico.get('continent') == continent]
+        teams = [dico for dico in teams if dico.get('continent_name') == continent]
 
     if request.method == 'POST':
         n_team = int(request.form.get('n_team'))
@@ -42,7 +43,7 @@ def tirage():
 def connexion_bdd():
     cnx = mysql.connector.connect(user='root', password='',
                                 host='127.0.0.1',
-                                database='fifa')
+                                database='fifa2k20')
     return cnx
 
 def get_team_filtre():
@@ -50,11 +51,13 @@ def get_team_filtre():
     cur = connexion_bdd()
     if cur and cur.is_connected():
         with cur.cursor(dictionary=True) as cursor:
-            result = cursor.execute(f"SELECT * FROM equipe ORDER BY points desc")
+            result = cursor.execute(f"SELECT continent.name AS continent_name, team.name AS team_name, team.scoring FROM team JOIN continent ON team.continent_id=continent.id ORDER BY scoring desc")
             rows = cursor.fetchall()
+            print(rows)
             for index,row in enumerate(rows):
                 row["classement"] = index + 1
                 teams.append(row)
+            print(teams)
         cur.close()
         
     else:

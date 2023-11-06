@@ -99,14 +99,14 @@
             <td>
               <div class="input-group-prepend">
                 <div class="input-group-text">
-                  <input type="checkbox" name="team_select" value="{{team.nom_equipe}}">
+                  <input type="checkbox" name="team_select" value="{{team.team_name}}">
                 </div>
               </div>
             </td>
             <td>{{team.classement}}</td>
-            <td>{{team.nom_equipe}}</td>
-            <td>{{team.points}}</td>
-            <td class="continent">{{team.continent}}</td>
+            <td>{{team.team_name}}</td>
+            <td>{{team.scoring}}</td>
+            <td class="continent">{{team.continent_name}}</td>
           </tr>
           {% endfor %} 
         </tbody>
