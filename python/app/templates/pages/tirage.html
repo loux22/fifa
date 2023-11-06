@@ -24,7 +24,7 @@
     <div style="margin: 5px;">
       <select name="n_team" id="n_team">
         <option value="">Choisis n_team</option>
-        <option value="2">2</option>
+        {# <option value="2">2</option> #}
         <option value="16">16</option>
         <option value="32">32</option>
       </select>
@@ -34,7 +34,54 @@
 
     <button class="btn btn-dark button_validate" type="submit" style="display: none; margin: 5px;">Tirage</button>
   
-    
+    {% if chapeau is not none %}
+    <div class="container">
+      <div class="row">
+      {% for chap in chapeau %}
+      <div class="col">
+        <table class="table">
+          <thead class="thead-dark">
+            <tr>
+              <th scope="col">Chapeau {{loop.index}}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for team in chap %}
+            <tr>
+              <th>{{team}}</th>
+            </tr>
+            {% endfor %}
+          </tbody>
+      </table>
+    </div>
+      {% endfor %} 
+    </div>
+  </div>
+
+    <div class="container">
+      <div class="row">
+      {% for poule in poules %}
+      {% set index_premiere_boucle = loop.index %}
+      <div class="col">
+        <table class="table">
+          <thead class="thead-dark">
+            <tr>
+              <th scope="col">Poule {{loop.index}}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for i in range(4) %}
+            <tr>
+              <th>{{poules[i][index_premiere_boucle - 1]}}</th>
+            </tr>
+            {% endfor %}
+          </tbody>
+      </table>
+    </div>
+      {% endfor %} 
+    </div>
+  </div>
+    {% endif %}
 
     <table class="table">
         <thead class="thead-dark">
