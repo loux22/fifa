@@ -1,0 +1,7 @@
+.continent::first-letter {
+  text-transform: uppercase;
+  }
+
+td{
+  font-size: 20px;
+}

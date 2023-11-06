@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Tirage
+{% endblock %}
+
+{% block link %}
+	<link rel="stylesheet" href="{{ url_for('static',filename='css/tirage.css') }}">
+{% endblock %}
+
+
+{% block body %}
+    <h1 style="text-align: center;">Tirage {{continent}}</h1>
+
+    <div style="margin: 5px; text-align:center;">
+      <a href="/tirage?continent=tous" class="btn btn-primary">Coupe du monde</a>
+      <a href="/tirage?continent=europe" class="btn btn-success">Europe</a>
+      <a href="/tirage?continent=asie" class="btn btn-danger">Asie</a>
+      <a href="/tirage?continent=amerique" class="btn btn-warning">Amerique</a>
+      <a href="/tirage?continent=afrique" class="btn btn-info">Afrique</a>
+    </div>
+
+    <p>Nombre d'équipe filtrés par continent : {{teams|length }}</p>
+     
+    <form action="/tirage?continent={{continent}}" method="post">
+    <div style="margin: 5px;">
+      <select name="n_team" id="n_team">
+        <option value="">Choisis n_team</option>
+        <option value="2">2</option>
+        <option value="16">16</option>
+        <option value="32">32</option>
+      </select>
+    </div>
+
+    <p>Nombre d'équipes séléctionnées : <span class="n_team_count">0</span></p>
+
+    <button class="btn btn-dark button_validate" type="submit" style="display: none; margin: 5px;">Tirage</button>
+  
+    
+
+    <table class="table">
+        <thead class="thead-dark">
+          <tr>
+            <th scope="col">Equipe selectionnées</th>
+            <th scope="col">Classement</th>
+            <th scope="col">Nom équipes</th>
+            <th scope="col">points</th>
+            <th scope="col">continents</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for team in teams %} 
+          <tr>
+            <td>
+              <div class="input-group-prepend">
+                <div class="input-group-text">
+                  <input type="checkbox" name="team_select" value="{{team.nom_equipe}}">
+                </div>
+              </div>
+            </td>
+            <td>{{team.classement}}</td>
+            <td>{{team.nom_equipe}}</td>
+            <td>{{team.points}}</td>
+            <td class="continent">{{team.continent}}</td>
+          </tr>
+          {% endfor %} 
+        </tbody>
+      </table>
+    </form>
+
+        
+{% endblock body %}
+
+{% block js %}
+<script src="{{ url_for('static',filename='js/tirage.js') }}"></script>
+{% endblock %}
